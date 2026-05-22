@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ media.title }} — VOD-Indexer{% endblock %}
+{% block content %}
+
+<div class="detail-layout">
+    <div class="detail-poster">
+        {% if media.poster_path %}
+        <img src="/poster/{{ media.id }}" alt="{{ media.title }}" class="detail-img" onerror="this.src='/static/img/no-poster.svg'">
+        {% else %}
+        <img src="/static/img/no-poster.svg" alt="{{ media.title }}" class="detail-img">
+        {% endif %}
+
+        <div class="detail-actions">
+            {% if media.status != 'synced' %}
+            <button class="btn btn-primary" onclick="syncMedia({{ media.id }})">▶ Sincronizar a Jellyfin</button>
+            {% else %}
+            <button class="btn btn-danger" onclick="removeMedia({{ media.id }})">✕ Quitar de Jellyfin</button>
+            {% endif %}
+            {% if not media.tmdb_id %}
+            <button class="btn btn-sm btn-ghost" onclick="fetchMeta({{ media.id }})">⟳ Obtener metadata</button>
+            {% endif %}
+        </div>
+
+        <div class="detail-status status-{{ media.status }}">
+            Estado: <strong>{{ media.status }}</strong>
+        </div>
+    </div>
+
+    <div class="detail-info">
+        <div class="detail-type-badge {{ media.media_type }}">
+            {{ 'Película' if media.media_type == 'movie' else 'Serie' }}
+        </div>
+        <h1 class="detail-title">{{ media.title }}{% if media.year %} <span class="year">({{ media.year }})</span>{% endif %}</h1>
+
+        {% if media.genres %}
+        <div class="genres">
+            {% for g in media.genres.split(',') %}
+            <span class="genre-tag">{{ g.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if media.overview %}
+        <p class="detail-overview">{{ media.overview }}</p>
+        {% endif %}
+
+        {% if people %}
+        <div class="people-list">
+            {% set actors = people | selectattr('role', 'equalto', 'actor') | list %}
+            {% set directors = people | selectattr('role', 'equalto', 'director') | list %}
+            {% if directors %}
+            <div class="people-group">
+                <span class="people-label">Director:</span>
+                {% for p in directors %}<span class="person-name">{{ p.name }}</span>{% if not loop.last %}, {% endif %}{% endfor %}
+            </div>
+            {% endif %}
+            {% if actors %}
+            <div class="people-group">
+                <span class="people-label">Reparto:</span>
+                {% for p in actors %}<span class="person-name">{{ p.name }}</span>{% if not loop.last %}, {% endif %}{% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if collection %}
+        <div class="collection-box">
+            <div class="collection-label">
+                {{ '📦 Colección' if collection.collection_type == 'movie' else '🎭 Franquicia' }}
+            </div>
+            <div class="collection-name">{{ collection.name }}</div>
+            <a href="/collections" class="btn btn-sm btn-ghost">Ver colección →</a>
+        </div>
+        {% endif %}
+
+        <!-- Sources -->
+        <div class="sources-section">
+            <h3 class="section-title">Fuentes disponibles</h3>
+            <div class="sources-list">
+            {% for src in sources %}
+                <div class="source-row {% if src.is_best %}source-best{% endif %} {% if src.id == media.selected_source_id %}source-selected{% endif %}">
+                    <div class="source-info">
+                        <span class="source-star">{% if src.is_best %}⭐{% else %}⚠{% endif %}</span>
+                        <span class="source-provider">{{ src.provider }}</span>
+                        {% if media.media_type == 'series' %}
+                        <span class="source-counts">{{ src.season_count }} temporadas · {{ src.episode_count }} eps</span>
+                        {% endif %}
+                        {% if src.synced %}<span class="source-synced-tag">Sincronizado</span>{% endif %}
+                    </div>
+                    <div class="source-actions">
+                        {% if src.id != media.selected_source_id %}
+                        <button class="btn btn-sm" onclick="selectSource({{ media.id }}, {{ src.id }})">Usar esta</button>
+                        {% else %}
+                        <span class="source-active-tag">✓ Activa</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const mediaId = {{ media.id }};
+
+async function syncMedia(id) {
+    if (!confirm("¿Sincronizar a Jellyfin?")) return;
+    showToast("Sincronizando...");
+    const r = await fetch(`/api/media/${id}/sync`, { method: "POST" });
+    const d = await r.json();
+    showToast(d.ok ? "✓ Sincronización iniciada" : "✗ Error: " + d.msg);
+    setTimeout(() => location.reload(), 2000);
+}
+
+async function removeMedia(id) {
+    if (!confirm("¿Quitar de Jellyfin?")) return;
+    const r = await fetch(`/api/media/${id}/remove`, { method: "POST" });
+    const d = await r.json();
+    showToast(d.ok ? "✓ Quitado de Jellyfin" : "✗ Error: " + d.msg);
+    setTimeout(() => location.reload(), 1500);
+}
+
+async function selectSource(mediaId, sourceId) {
+    const r = await fetch(`/api/media/${mediaId}/select-source`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source_id: sourceId }),
+    });
+    showToast("✓ Fuente actualizada");
+    setTimeout(() => location.reload(), 1000);
+}
+
+async function fetchMeta(id) {
+    showToast("Obteniendo metadata...");
+    await fetch(`/api/media/${id}/fetch-meta`, { method: "POST" });
+    showToast("✓ Metadata actualizada");
+    setTimeout(() => location.reload(), 1500);
+}
+</script>
+{% endblock %}

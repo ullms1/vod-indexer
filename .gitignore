@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# Database and generated data
+data/media.db
+data/media.db-wal
+data/media.db-shm
+data/posters/
+data/logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Docker
+*.tar.gz
+
+# OS
+.DS_Store
+Thumbs.db

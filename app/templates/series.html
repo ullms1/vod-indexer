@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Series — VOD-Indexer{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">Series <span class="count-badge">{{ total }}</span></h1>
+</div>
+
+<div class="filter-bar">
+    <form class="search-form" method="get" action="/series">
+        <input type="text" name="q" value="{{ q }}" placeholder="Buscar series..." class="search-input" autocomplete="off">
+        <select name="provider" class="filter-select">
+            <option value="">Todos los providers</option>
+            {% for p in providers %}
+            <option value="{{ p }}" {% if provider == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="available" {% if status == 'available' %}selected{% endif %}>Disponible</option>
+            <option value="synced" {% if status == 'synced' %}selected{% endif %}>Sincronizado</option>
+        </select>
+        <button type="submit" class="btn">Buscar</button>
+        {% if q or provider or status %}
+        <a href="/series" class="btn btn-ghost">✕ Limpiar</a>
+        {% endif %}
+    </form>
+</div>
+
+{% if items %}
+<div class="poster-grid">
+{% for item in items %}
+    <a href="/media/{{ item.id }}" class="poster-card status-{{ item.status }}">
+        <div class="poster-img-wrap">
+            {% if item.poster_path %}
+            <img src="/poster/{{ item.id }}" alt="{{ item.title }}" loading="lazy" onerror="this.src='/static/img/no-poster.svg'">
+            {% else %}
+            <img src="/static/img/no-poster.svg" alt="{{ item.title }}">
+            {% endif %}
+            {% if item.source_count > 1 %}
+            <div class="multi-source-badge">{{ item.source_count }}src</div>
+            {% endif %}
+            {% if item.season_count %}
+            <div class="season-badge">{{ item.season_count }}T</div>
+            {% endif %}
+            {% if item.status == 'synced' %}
+            <div class="poster-synced">✓</div>
+            {% endif %}
+        </div>
+        <div class="poster-info">
+            <div class="poster-title">{{ item.title }}</div>
+            <div class="poster-meta">
+                {% if item.year %}{{ item.year }}{% endif %}
+                {% if item.best_provider %} · {{ item.best_provider }}{% endif %}
+            </div>
+        </div>
+    </a>
+{% endfor %}
+</div>
+
+{% if pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page - 1 }}" class="btn btn-ghost">‹ Anterior</a>
+    {% endif %}
+    <span class="page-info">{{ page }} / {{ pages }}</span>
+    {% if page < pages %}
+    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page + 1 }}" class="btn btn-ghost">Siguiente ›</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📺</div>
+    <p>No se encontraron series{% if q %} para "{{ q }}"{% endif %}.</p>
+    {% if not q %}
+    <button class="btn" onclick="triggerScan()">⟳ Escanear biblioteca</button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

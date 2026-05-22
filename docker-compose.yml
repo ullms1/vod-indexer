@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  vod-indexer:
+    build: .
+    container_name: vod-indexer
+    restart: unless-stopped
+    ports:
+      - "3030:3030"
+    volumes:
+      # Source directories — READ ONLY (your IPTV/STRM provider output)
+      - /your/path/to/Movies:/vods/Movies:ro
+      - /your/path/to/Series:/vods/Series:ro
+      # Output directories — Jellyfin/Plex/Emby will scan these
+      - /your/path/to/MyMovies:/vods/MisMovies
+      - /your/path/to/MySeries:/vods/MisSeries
+      # Persistent data (database + posters + logs)
+      - ./data:/data
+    environment:
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - MOVIES_SRC=/vods/Movies
+      - SERIES_SRC=/vods/Series
+      - MOVIES_OUT=/vods/MisMovies
+      - SERIES_OUT=/vods/MisSeries
+      - DB_PATH=/data/media.db
+      - POSTER_DIR=/data/posters
+      - DATA_DIR=/data
