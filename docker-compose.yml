@@ -9,11 +9,11 @@ services:
       - "13030:3030"
     volumes:
       # Source directories — READ ONLY (your IPTV/STRM provider output)
-      - /mnt/user/Media/VOD/Movies:/vods/Movies:ro
-      - /mnt/user/Media/VOD/Series:/vods/Series:ro
+      - /mnt/user/Media/VODS/Movies:/vods/Movies:ro
+      - /mnt/user/Media/VODS/Series:/vods/Series:ro
       # Output directories — Jellyfin/Plex/Emby will scan these
-      - /mnt/user/Media/VOD/EMBY-VODS/MyMovies:/vods/MisMovies
-      - /mnt/user/Media/VOD/EMBY-VODS/MySeries:/vods/MisSeries
+      - /mnt/user/Media/VODS/EMBY-VODS/Movies:/vods/MisMovies
+      - /mnt/user/Media/VODS/EMBY-VODS/Series:/vods/MisSeries
       # Persistent data (database + posters + logs)
       - /mnt/cache/appdata/vodindexer/data:/data
     environment:
