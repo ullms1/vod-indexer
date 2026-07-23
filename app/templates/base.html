@@ -15,13 +15,13 @@
         </a>
         <div class="nav-links">
             <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">Dashboard</a>
-            <a href="/movies" class="nav-link {% if '/movies' in request.url.path %}active{% endif %}">Películas</a>
+            <a href="/movies" class="nav-link {% if '/movies' in request.url.path %}active{% endif %}">Movies</a>
             <a href="/series" class="nav-link {% if '/series' in request.url.path %}active{% endif %}">Series</a>
-            <a href="/collections" class="nav-link {% if '/collections' in request.url.path %}active{% endif %}">Colecciones</a>
+            <a href="/collections" class="nav-link {% if '/collections' in request.url.path %}active{% endif %}">Collections</a>
         </div>
         <div class="nav-actions">
             <button class="btn btn-scan" onclick="triggerScan()" id="scan-btn">
-                ⟳ Escanear
+                ⟳ Scan
             </button>
         </div>
     </nav>
