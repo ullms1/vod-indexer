@@ -8,21 +8,21 @@
 
 <div class="filter-bar">
     <form class="search-form" method="get" action="/series">
-        <input type="text" name="q" value="{{ q }}" placeholder="Buscar series..." class="search-input" autocomplete="off">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search series..." class="search-input" autocomplete="off">
         <select name="provider" class="filter-select">
-            <option value="">Todos los providers</option>
+            <option value="">All providers</option>
             {% for p in providers %}
             <option value="{{ p }}" {% if provider == p %}selected{% endif %}>{{ p }}</option>
             {% endfor %}
         </select>
         <select name="status" class="filter-select">
-            <option value="">Todos los estados</option>
-            <option value="available" {% if status == 'available' %}selected{% endif %}>Disponible</option>
-            <option value="synced" {% if status == 'synced' %}selected{% endif %}>Sincronizado</option>
+            <option value="">All statuses</option>
+            <option value="available" {% if status == 'available' %}selected{% endif %}>Available</option>
+            <option value="synced" {% if status == 'synced' %}selected{% endif %}>Synced</option>
         </select>
-        <button type="submit" class="btn">Buscar</button>
+        <button type="submit" class="btn">Search</button>
         {% if q or provider or status %}
-        <a href="/series" class="btn btn-ghost">✕ Limpiar</a>
+        <a href="/series" class="btn btn-ghost">✕ Clear</a>
         {% endif %}
     </form>
 </div>
@@ -41,7 +41,7 @@
             <div class="multi-source-badge">{{ item.source_count }}src</div>
             {% endif %}
             {% if item.season_count %}
-            <div class="season-badge">{{ item.season_count }}T</div>
+            <div class="season-badge">{{ item.season_count }}S</div>
             {% endif %}
             {% if item.status == 'synced' %}
             <div class="poster-synced">✓</div>
@@ -61,11 +61,11 @@
 {% if pages > 1 %}
 <div class="pagination">
     {% if page > 1 %}
-    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page - 1 }}" class="btn btn-ghost">‹ Anterior</a>
+    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page - 1 }}" class="btn btn-ghost">‹ Previous</a>
     {% endif %}
     <span class="page-info">{{ page }} / {{ pages }}</span>
     {% if page < pages %}
-    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page + 1 }}" class="btn btn-ghost">Siguiente ›</a>
+    <a href="?q={{ q }}&provider={{ provider }}&status={{ status }}&page={{ page + 1 }}" class="btn btn-ghost">Next ›</a>
     {% endif %}
 </div>
 {% endif %}
@@ -73,9 +73,9 @@
 {% else %}
 <div class="empty-state">
     <div class="empty-icon">📺</div>
-    <p>No se encontraron series{% if q %} para "{{ q }}"{% endif %}.</p>
+    <p>No series found{% if q %} for "{{ q }}"{% endif %}.</p>
     {% if not q %}
-    <button class="btn" onclick="triggerScan()">⟳ Escanear biblioteca</button>
+    <button class="btn" onclick="triggerScan()">⟳ Scan library</button>
     {% endif %}
 </div>
 {% endif %}

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Colecciones — VOD-Indexer{% endblock %}
+{% block title %}Collections — VOD-Indexer{% endblock %}
 {% block content %}
 
 <div class="page-header">
-    <h1 class="page-title">Colecciones & Franquicias</h1>
+    <h1 class="page-title">Collections & Franchises</h1>
 </div>
 
 {% if movie_collections %}
 <div class="section-header">
-    <h2>📦 Colecciones de Películas</h2>
+    <h2>📦 Movie Collections</h2>
     <span class="count-badge">{{ movie_collections | length }}</span>
 </div>
 <div class="collections-grid">
@@ -18,10 +18,10 @@
         <span class="coll-icon">📦</span>
         <h3 class="coll-name">{{ coll.name }}</h3>
     </div>
-    <div class="coll-count">{{ coll.item_count }} película{{ 's' if coll.item_count != 1 }}</div>
+    <div class="coll-count">{{ coll.item_count }} movie{{ 's' if coll.item_count != 1 }}</div>
     <div class="coll-actions">
-        <a href="/api/collections/{{ coll.id }}" class="btn btn-sm btn-ghost" target="_blank">Ver items</a>
-        <button class="btn btn-sm" onclick="syncCollection({{ coll.id }})">▶ Sync todo</button>
+        <a href="/api/collections/{{ coll.id }}" class="btn btn-sm btn-ghost" target="_blank">View items</a>
+        <button class="btn btn-sm" onclick="syncCollection({{ coll.id }})">▶ Sync all</button>
     </div>
 </div>
 {% endfor %}
@@ -30,7 +30,7 @@
 
 {% if franchises %}
 <div class="section-header">
-    <h2>🎭 Franquicias de Series</h2>
+    <h2>🎭 Series Franchises</h2>
     <span class="count-badge">{{ franchises | length }}</span>
 </div>
 <div class="collections-grid">
@@ -40,10 +40,10 @@
         <span class="coll-icon">🎭</span>
         <h3 class="coll-name">{{ fr.name }}</h3>
     </div>
-    <div class="coll-count">{{ fr.item_count }} serie{{ 's' if fr.item_count != 1 }}</div>
+    <div class="coll-count">{{ fr.item_count }} series{{ 's' if fr.item_count != 1 }}</div>
     <div class="coll-actions">
-        <a href="/api/collections/{{ fr.id }}" class="btn btn-sm btn-ghost" target="_blank">Ver series</a>
-        <button class="btn btn-sm" onclick="syncCollection({{ fr.id }})">▶ Sync todo</button>
+        <a href="/api/collections/{{ fr.id }}" class="btn btn-sm btn-ghost" target="_blank">View series</a>
+        <button class="btn btn-sm" onclick="syncCollection({{ fr.id }})">▶ Sync all</button>
     </div>
 </div>
 {% endfor %}
@@ -53,8 +53,8 @@
 {% if not movie_collections and not franchises %}
 <div class="empty-state">
     <div class="empty-icon">📚</div>
-    <p>No hay colecciones todavía. Escanea la biblioteca para detectarlas.</p>
-    <button class="btn" onclick="triggerScan()">⟳ Escanear ahora</button>
+    <p>No collections yet. Scan your library to detect them.</p>
+    <button class="btn" onclick="triggerScan()">⟳ Scan now</button>
 </div>
 {% endif %}
 
@@ -63,11 +63,11 @@
 {% block scripts %}
 <script>
 async function syncCollection(id) {
-    if (!confirm("¿Sincronizar toda la colección a Jellyfin?")) return;
-    showToast("Sincronizando colección...");
+    if (!confirm("Sync entire collection to Jellyfin?")) return;
+    showToast("Syncing collection...");
     const r = await fetch(`/api/collections/${id}/sync`, { method: "POST" });
     const d = await r.json();
-    showToast(d.ok ? `✓ Sync iniciado` : "✗ Error");
+    showToast(d.ok ? `✓ Sync started` : "✗ Error");
 }
 </script>
 {% endblock %}
