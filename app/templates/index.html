@@ -4,21 +4,21 @@
 
 <div class="page-header">
     <h1 class="page-title">Dashboard</h1>
-    <p class="page-sub">Biblioteca de medios indexada</p>
+    <p class="page-sub">Indexed media library</p>
 </div>
 
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-value">{{ stats.total }}</div>
-        <div class="stat-label">Total indexado</div>
+        <div class="stat-label">Total indexed</div>
     </div>
     <div class="stat-card accent">
         <div class="stat-value">{{ stats.synced }}</div>
-        <div class="stat-label">Sincronizado a Jellyfin</div>
+        <div class="stat-label">Synced to Jellyfin</div>
     </div>
     <div class="stat-card">
         <div class="stat-value">{{ stats.movies }}</div>
-        <div class="stat-label">Películas</div>
+        <div class="stat-label">Movies</div>
     </div>
     <div class="stat-card">
         <div class="stat-value">{{ stats.series }}</div>
@@ -26,19 +26,19 @@
     </div>
     <div class="stat-card warn">
         <div class="stat-value">{{ stats.pending }}</div>
-        <div class="stat-label">Sin metadata</div>
+        <div class="stat-label">Missing metadata</div>
     </div>
 </div>
 
 {% if stats.pending > 0 %}
 <div class="alert-bar">
-    <span>⚠ {{ stats.pending }} items sin metadata TMDB.</span>
-    <button class="btn btn-sm" onclick="fetchMeta()">Obtener metadata</button>
+    <span>⚠ {{ stats.pending }} items missing TMDB metadata.</span>
+    <button class="btn btn-sm" onclick="fetchMeta()">Fetch metadata</button>
 </div>
 {% endif %}
 
 <div class="section-header">
-    <h2>Agregados recientemente</h2>
+    <h2>Recently Added</h2>
 </div>
 
 <div class="poster-grid">
@@ -50,7 +50,7 @@
             {% else %}
             <img src="/static/img/no-poster.svg" alt="{{ item.title }}">
             {% endif %}
-            <div class="poster-badge {{ item.media_type }}">{{ 'P' if item.media_type == 'movie' else 'S' }}</div>
+            <div class="poster-badge {{ item.media_type }}">{{ 'M' if item.media_type == 'movie' else 'S' }}</div>
             {% if item.status == 'synced' %}
             <div class="poster-synced">✓</div>
             {% endif %}
@@ -71,10 +71,10 @@
 {% block scripts %}
 <script>
 async function fetchMeta() {
-    showToast("Obteniendo metadata...");
+    showToast("Fetching metadata...");
     const r = await fetch("/api/scan/metadata", { method: "POST" });
     const d = await r.json();
-    showToast(`✓ Metadata obtenida para ${d.fetched} items`);
+    showToast(`✓ Metadata fetched for ${d.fetched} items`);
     setTimeout(() => location.reload(), 1500);
 }
 </script>

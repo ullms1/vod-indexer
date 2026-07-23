@@ -12,23 +12,23 @@
 
         <div class="detail-actions">
             {% if media.status != 'synced' %}
-            <button class="btn btn-primary" onclick="syncMedia({{ media.id }})">▶ Sincronizar a Jellyfin</button>
+            <button class="btn btn-primary" onclick="syncMedia({{ media.id }})">▶ Sync to Jellyfin</button>
             {% else %}
-            <button class="btn btn-danger" onclick="removeMedia({{ media.id }})">✕ Quitar de Jellyfin</button>
+            <button class="btn btn-danger" onclick="removeMedia({{ media.id }})">✕ Remove from Jellyfin</button>
             {% endif %}
             {% if not media.tmdb_id %}
-            <button class="btn btn-sm btn-ghost" onclick="fetchMeta({{ media.id }})">⟳ Obtener metadata</button>
+            <button class="btn btn-sm btn-ghost" onclick="fetchMeta({{ media.id }})">⟳ Fetch metadata</button>
             {% endif %}
         </div>
 
         <div class="detail-status status-{{ media.status }}">
-            Estado: <strong>{{ media.status }}</strong>
+            Status: <strong>{{ media.status }}</strong>
         </div>
     </div>
 
     <div class="detail-info">
         <div class="detail-type-badge {{ media.media_type }}">
-            {{ 'Película' if media.media_type == 'movie' else 'Serie' }}
+            {{ 'Movie' if media.media_type == 'movie' else 'Series' }}
         </div>
         <h1 class="detail-title">{{ media.title }}{% if media.year %} <span class="year">({{ media.year }})</span>{% endif %}</h1>
 
@@ -56,7 +56,7 @@
             {% endif %}
             {% if actors %}
             <div class="people-group">
-                <span class="people-label">Reparto:</span>
+                <span class="people-label">Cast:</span>
                 {% for p in actors %}<span class="person-name">{{ p.name }}</span>{% if not loop.last %}, {% endif %}{% endfor %}
             </div>
             {% endif %}
@@ -66,16 +66,16 @@
         {% if collection %}
         <div class="collection-box">
             <div class="collection-label">
-                {{ '📦 Colección' if collection.collection_type == 'movie' else '🎭 Franquicia' }}
+                {{ '📦 Collection' if collection.collection_type == 'movie' else '🎭 Franchise' }}
             </div>
             <div class="collection-name">{{ collection.name }}</div>
-            <a href="/collections" class="btn btn-sm btn-ghost">Ver colección →</a>
+            <a href="/collections" class="btn btn-sm btn-ghost">View collection →</a>
         </div>
         {% endif %}
 
         <!-- Sources -->
         <div class="sources-section">
-            <h3 class="section-title">Fuentes disponibles</h3>
+            <h3 class="section-title">Available Sources</h3>
             <div class="sources-list">
             {% for src in sources %}
                 <div class="source-row {% if src.is_best %}source-best{% endif %} {% if src.id == media.selected_source_id %}source-selected{% endif %}">
@@ -83,15 +83,15 @@
                         <span class="source-star">{% if src.is_best %}⭐{% else %}⚠{% endif %}</span>
                         <span class="source-provider">{{ src.provider }}</span>
                         {% if media.media_type == 'series' %}
-                        <span class="source-counts">{{ src.season_count }} temporadas · {{ src.episode_count }} eps</span>
+                        <span class="source-counts">{{ src.season_count }} seasons · {{ src.episode_count }} eps</span>
                         {% endif %}
-                        {% if src.synced %}<span class="source-synced-tag">Sincronizado</span>{% endif %}
+                        {% if src.synced %}<span class="source-synced-tag">Synced</span>{% endif %}
                     </div>
                     <div class="source-actions">
                         {% if src.id != media.selected_source_id %}
-                        <button class="btn btn-sm" onclick="selectSource({{ media.id }}, {{ src.id }})">Usar esta</button>
+                        <button class="btn btn-sm" onclick="selectSource({{ media.id }}, {{ src.id }})">Use this</button>
                         {% else %}
-                        <span class="source-active-tag">✓ Activa</span>
+                        <span class="source-active-tag">✓ Active</span>
                         {% endif %}
                     </div>
                 </div>
@@ -108,19 +108,19 @@
 const mediaId = {{ media.id }};
 
 async function syncMedia(id) {
-    if (!confirm("¿Sincronizar a Jellyfin?")) return;
-    showToast("Sincronizando...");
+    if (!confirm("Sync to Jellyfin?")) return;
+    showToast("Syncing...");
     const r = await fetch(`/api/media/${id}/sync`, { method: "POST" });
     const d = await r.json();
-    showToast(d.ok ? "✓ Sincronización iniciada" : "✗ Error: " + d.msg);
+    showToast(d.ok ? "✓ Sync started" : "✗ Error: " + d.msg);
     setTimeout(() => location.reload(), 2000);
 }
 
 async function removeMedia(id) {
-    if (!confirm("¿Quitar de Jellyfin?")) return;
+    if (!confirm("Remove from Jellyfin?")) return;
     const r = await fetch(`/api/media/${id}/remove`, { method: "POST" });
     const d = await r.json();
-    showToast(d.ok ? "✓ Quitado de Jellyfin" : "✗ Error: " + d.msg);
+    showToast(d.ok ? "✓ Removed from Jellyfin" : "✗ Error: " + d.msg);
     setTimeout(() => location.reload(), 1500);
 }
 
@@ -130,14 +130,14 @@ async function selectSource(mediaId, sourceId) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ source_id: sourceId }),
     });
-    showToast("✓ Fuente actualizada");
+    showToast("✓ Source updated");
     setTimeout(() => location.reload(), 1000);
 }
 
 async function fetchMeta(id) {
-    showToast("Obteniendo metadata...");
+    showToast("Fetching metadata...");
     await fetch(`/api/media/${id}/fetch-meta`, { method: "POST" });
-    showToast("✓ Metadata actualizada");
+    showToast("✓ Metadata updated");
     setTimeout(() => location.reload(), 1500);
 }
 </script>
