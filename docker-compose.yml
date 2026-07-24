@@ -17,6 +17,7 @@ services:
       # Persistent data (database + posters + logs)
       - /mnt/cache/appdata/vodindexer/data:/data
     environment:
+      - TMDB_API_KEY=${TMDB_API_KEY}
       - MOVIES_SRC=/vods/Movies
       - SERIES_SRC=/vods/Series
       - MOVIES_OUT=/vods/MisMovies
